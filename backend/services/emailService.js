@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 // Create transporter
 const transporter = nodemailer.createTransport({
@@ -98,7 +98,7 @@ const sendBookingConfirmation = async (booking) => {
   }
 };
 
-module.exports = {
+export {
   sendOrderConfirmation,
   sendBookingConfirmation,
 };

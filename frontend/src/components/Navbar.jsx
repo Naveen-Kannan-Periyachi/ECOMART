@@ -13,7 +13,7 @@ import { logout } from '../features/authSlice';
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user, isAdmin } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -82,6 +82,36 @@ const Navbar = () => {
                 }} component={Link} to="/dashboard">
                   Dashboard
                 </Button>
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} component={Link} to="/chats">
+                  Chats
+                </Button>
+                {isAdmin && (
+                  <Button sx={{
+                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                    color: '#fff',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                    transition: 'background 0.3s, transform 0.2s',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
+                      transform: 'scale(1.05)',
+                    },
+                  }} component={Link} to="/admin/dashboard">
+                    Admin Panel
+                  </Button>
+                )}
                 <Button sx={{
                   background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
                   color: '#222',

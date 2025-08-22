@@ -33,7 +33,13 @@ const Login = () => {
     e.preventDefault();
     const resultAction = await dispatch(login(formData));
     if (login.fulfilled.match(resultAction)) {
-      navigate('/dashboard');
+      // Check if user is admin and redirect accordingly
+      const user = resultAction.payload;
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 

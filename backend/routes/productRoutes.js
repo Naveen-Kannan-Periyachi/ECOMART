@@ -2,6 +2,7 @@ import express from 'express';
 import asyncHandler from 'express-async-handler';
 import Product from '../models/productModel.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validateProduct, validateObjectId } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const router = express.Router();
 router.post(
   '/',
   protect,
+  validateProduct,
   asyncHandler(async (req, res) => {
     const {
       title,

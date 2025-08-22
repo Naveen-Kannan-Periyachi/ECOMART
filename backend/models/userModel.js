@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
       type: String, // URL or file path to the avatar image
       default: '',
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
   },
   {
     timestamps: true,

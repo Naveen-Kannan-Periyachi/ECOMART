@@ -43,6 +43,7 @@ router.post(
         email: user.email,
         phone: user.phone,
         address: user.address,
+        role: user.role,
         token: generateToken(user._id),
       });
     } else {
@@ -99,6 +100,7 @@ router.post(
         email: user.email,
         phone: user.phone,
         address: user.address,
+        role: user.role,
         token: token
       });
     } catch (error) {
@@ -139,6 +141,7 @@ router.get(
         email: user.email,
         phone: user.phone,
         address: user.address,
+        role: user.role,
       });
     } else {
       res.status(404);
