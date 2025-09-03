@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useEffect, useState, useRef, useCallback, memo } from 'react';
+=======
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -123,6 +127,7 @@ const Chat = () => {
   useEffect(() => {
     if (!user || !chatId) return;
 
+<<<<<<< HEAD
     console.log('Initializing socket connection for chat:', chatId);
     console.log('User:', user);
     console.log('Token:', localStorage.getItem('token') ? 'exists' : 'not found');
@@ -145,6 +150,20 @@ const Chat = () => {
 
     newSocket.on('message', (newMessage) => {
       console.log('Received new message:', newMessage);
+=======
+    const newSocket = io('http://localhost:5001', {
+      auth: {
+        token: localStorage.getItem('token')
+      }
+    });
+
+    newSocket.on('connect', () => {
+      console.log('Connected to chat server');
+      newSocket.emit('join', { chatId });
+    });
+
+    newSocket.on('message', (newMessage) => {
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       // Check if message is from another user
       const isFromOtherUser = newMessage.senderId !== user._id;
       
@@ -156,11 +175,17 @@ const Chat = () => {
         );
         
         if (isDuplicate) {
+<<<<<<< HEAD
           console.log('Duplicate message detected, skipping');
           return prev;
         }
         
         console.log('Adding new message to state');
+=======
+          return prev;
+        }
+        
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
         return [...prev, newMessage];
       });
       
@@ -175,7 +200,10 @@ const Chat = () => {
     });
 
     newSocket.on('typing', ({ userId, isTyping: typing }) => {
+<<<<<<< HEAD
       console.log('Typing event received:', { userId, typing });
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       if (userId !== user._id) {
         setIsTyping(typing);
       }
@@ -188,7 +216,10 @@ const Chat = () => {
     setSocket(newSocket);
 
     return () => {
+<<<<<<< HEAD
       console.log('Cleaning up socket connection');
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       newSocket.disconnect();
     };
   }, [user, chatId, playNotificationSound, showBrowserNotification, showInAppNotification]);
@@ -262,6 +293,7 @@ const Chat = () => {
     setSending(true);
 
     try {
+<<<<<<< HEAD
       console.log('Sending message:', messageContent);
       const response = await api.post(`/chat/${chatId}/message`, {
         content: messageContent
@@ -269,6 +301,12 @@ const Chat = () => {
       
       console.log('Message sent successfully:', response.data);
       
+=======
+      await api.post(`/chat/${chatId}/message`, {
+        content: messageContent
+      });
+      
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       // Don't add optimistically - let Socket.IO handle it to avoid duplicates
       // The backend will emit the message via Socket.IO
       
@@ -278,9 +316,13 @@ const Chat = () => {
       }
       
     } catch (err) {
+<<<<<<< HEAD
       console.error('Error sending message:', err);
       const errorMessage = err.response?.data?.message || 'Failed to send message';
       alert(errorMessage);
+=======
+      alert(err.response?.data?.message || 'Failed to send message');
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       setInput(messageContent); // Restore message on error
     } finally {
       setSending(false);

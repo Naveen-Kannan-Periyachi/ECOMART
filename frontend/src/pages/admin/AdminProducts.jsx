@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllProducts, deleteProduct } from '../../features/adminSlice';
 import { toast } from 'react-toastify';
 import { FiTrash2, FiPackage, FiEye } from 'react-icons/fi';
+<<<<<<< HEAD
 import { getProductImageUrl } from '../../utils/imageUtils';
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 const AdminProducts = () => {
   const dispatch = useDispatch();
@@ -101,7 +104,11 @@ const AdminProducts = () => {
               <div className="h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
                 {product.images && product.images.length > 0 ? (
                   <img
+<<<<<<< HEAD
                     src={getProductImageUrl(product.images)}
+=======
+                    src={`http://localhost:5001${product.images[0]}`}
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
                     alt={product.title}
                     className="h-full w-full object-cover rounded-lg"
                   />

@@ -2,7 +2,10 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
 import Order from '../models/Order.js';
+<<<<<<< HEAD
 import { Chat, Message } from '../models/chatModel.js';
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 // @desc    Get all users
 // @route   GET /api/admin/users
@@ -16,6 +19,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 // @desc    Get single user details with products, orders, and chats
 // @route   GET /api/admin/users/:id
 // @access  Private/Admin
@@ -110,6 +114,8 @@ export const getUserDetails = asyncHandler(async (req, res) => {
   });
 });
 
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 // @desc    Update user role
 // @route   PATCH /api/admin/users/:id/role
 // @access  Private/Admin
@@ -256,6 +262,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     data: order
   });
 });
+<<<<<<< HEAD
 
 // @desc    Delete user's product (from user details page)
 // @route   DELETE /api/admin/users/:userId/products/:productId
@@ -329,3 +336,5 @@ export const deleteUserChat = asyncHandler(async (req, res) => {
     message: 'Chat and all messages deleted successfully'
   });
 });
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f

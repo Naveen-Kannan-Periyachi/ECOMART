@@ -1,13 +1,17 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+<<<<<<< HEAD
 import { Box, CircularProgress, Typography } from '@mui/material';
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useSelector((state) => state.auth);
 
   if (loading) {
     return (
+<<<<<<< HEAD
       <Box
         sx={{
           display: 'flex',
@@ -24,6 +28,11 @@ const AdminRoute = ({ children }) => {
           Verifying admin permissions...
         </Typography>
       </Box>
+=======
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin-primary"></div>
+      </div>
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
     );
   }
 

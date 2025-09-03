@@ -4,8 +4,11 @@ import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './components/AdminLayout';
+<<<<<<< HEAD
 import useWebSocket from './hooks/useWebSocket';
 import './styles/productDisplay.css';
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 import Register from './pages/Register';
 import Login from './pages/Login';
 import ProductList from './pages/ProductList';
@@ -18,11 +21,16 @@ import ChatList from './pages/ChatList';
 import OrderDetails from './pages/OrderDetails';
 import Negotiations from './pages/Negotiations';
 import Home from './pages/Home';
+<<<<<<< HEAD
 import ApiTest from './pages/ApiTest';
 import DirectApiTest from './pages/DirectApiTest';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminUserDetails from './pages/admin/AdminUserDetails';
+=======
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 
@@ -31,9 +39,12 @@ function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
   
+<<<<<<< HEAD
   // Initialize WebSocket connection
   useWebSocket();
   
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   return (
     <Box sx={{ 
       minHeight: '100vh',
@@ -56,6 +67,7 @@ function App() {
           <Route path="/products" element={<ProductList />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+<<<<<<< HEAD
           <Route path="/api-test" element={<ApiTest />} />
           <Route path="/direct-api-test" element={<DirectApiTest />} />
           
@@ -68,6 +80,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           
@@ -96,6 +110,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+<<<<<<< HEAD
           <Route
             path="/product/edit/:id"
             element={
@@ -104,10 +119,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
           <Route path="/cart" element={<Cart />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/chats" element={<ChatList />} />
           <Route path="/chat/:chatId" element={<Chat />} />
+<<<<<<< HEAD
           <Route 
             path="/negotiations" 
             element={
@@ -124,6 +142,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
           
           {/* Admin Routes */}
           <Route 
@@ -136,7 +156,10 @@ function App() {
           >
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
+<<<<<<< HEAD
             <Route path="users/:id" element={<AdminUserDetails />} />
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
           </Route>

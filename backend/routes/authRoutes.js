@@ -39,6 +39,7 @@ router.post(
       }
     }
 
+<<<<<<< HEAD
     try {
       const user = await User.create({
         name,
@@ -46,6 +47,25 @@ router.post(
         password,
         phone,
         address,
+=======
+    const user = await User.create({
+      name,
+      email,
+      password,
+      phone,
+      address,
+    });
+
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        role: user.role,
+        token: generateToken(user._id),
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       });
 
       if (user) {

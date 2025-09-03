@@ -34,7 +34,11 @@ export const validateProduct = [
     .withMessage('Price must be greater than 0'),
   
   body('rentPricePerDay')
+<<<<<<< HEAD
     .if(body('type').equals('rent'))
+=======
+    .optional()
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
     .isFloat({ min: 0.01 })
     .withMessage('Rent price per day must be greater than 0'),
   

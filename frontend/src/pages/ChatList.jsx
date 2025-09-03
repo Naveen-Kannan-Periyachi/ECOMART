@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useEffect, useState, memo } from 'react';
+=======
+import React, { useEffect, useState } from 'react';
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -254,4 +258,8 @@ const ChatList = () => {
   );
 };
 
+<<<<<<< HEAD
 export default memo(ChatList);
+=======
+export default ChatList;
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f

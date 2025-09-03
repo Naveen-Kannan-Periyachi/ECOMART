@@ -12,6 +12,7 @@ const router = express.Router();
 // Start chat (or get existing)
 router.post('/start', protect, asyncHandler(async (req, res) => {
   const { productId } = req.body;
+<<<<<<< HEAD
   
   // Validate input
   if (!productId) {
@@ -146,6 +147,72 @@ router.get('/:chatId/info', protect, asyncHandler(async (req, res) => {
     .populate('sellerId', 'name email')
     .populate('productId', 'title price images');
 
+=======
+  if (!productId) return res.status(400).json({ message: 'Product ID required' });
+  
+  const product = await Product.findById(productId);
+  if (!product) return res.status(404).json({ message: 'Product not found' });
+  
+  const sellerId = product.owner;
+  const buyerId = req.user._id;
+  
+  if (sellerId.toString() === buyerId.toString()) {
+    return res.status(400).json({ message: 'Cannot start chat with yourself' });
+  }
+  
+  let chat = await Chat.findOne({ productId, buyerId, sellerId });
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
+  if (!chat) {
+    return res.status(404).json({ message: 'Chat not found' });
+  }
+<<<<<<< HEAD
+
+  // Check if user is part of this chat
+  if (chat.buyerId._id.toString() !== req.user._id.toString() && 
+      chat.sellerId._id.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  // Structure the response
+  const chatInfo = {
+    _id: chat._id,
+    buyerId: chat.buyerId._id,
+    sellerId: chat.sellerId._id,
+    productId: chat.productId._id,
+    buyer: {
+      _id: chat.buyerId._id,
+      name: chat.buyerId.name,
+      email: chat.buyerId.email
+    },
+    seller: {
+      _id: chat.sellerId._id,
+      name: chat.sellerId.name,
+      email: chat.sellerId.email
+    },
+    product: {
+      _id: chat.productId._id,
+      title: chat.productId.title,
+      price: chat.productId.price,
+      images: chat.productId.images
+    },
+    createdAt: chat.createdAt,
+    updatedAt: chat.updatedAt
+  };
+
+  res.json(chatInfo);
+=======
+  
+  res.json(chat);
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
+}));
+
+// Get chat info with populated data
+router.get('/:chatId/info', protect, asyncHandler(async (req, res) => {
+  const chat = await Chat.findById(req.params.chatId)
+    .populate('buyerId', 'name email')
+    .populate('sellerId', 'name email')
+    .populate('productId', 'title price images');
+
   if (!chat) {
     return res.status(404).json({ message: 'Chat not found' });
   }
@@ -253,6 +320,7 @@ router.post('/:chatId/message', protect, canAccessChat, asyncHandler(async (req,
   // Update chat's updatedAt timestamp
   await Chat.findByIdAndUpdate(req.params.chatId, { updatedAt: new Date() });
 
+<<<<<<< HEAD
   // Get product info for notification
   const product = await Product.findById(req.chat.productId);
   
@@ -279,6 +347,8 @@ router.post('/:chatId/message', protect, canAccessChat, asyncHandler(async (req,
     // Don't fail the message sending if notification fails
   }
 
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   // Socket.io broadcast (if available)
   if (req.app.get('io')) {
     req.app.get('io').to(`chat_${req.params.chatId}`).emit('message', formattedMessage);

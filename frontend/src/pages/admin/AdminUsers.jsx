@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom';
 import { getAllUsers, updateUserRole, deleteUser } from '../../features/adminSlice';
 import { toast } from 'react-toastify';
@@ -8,6 +9,14 @@ import { FiEdit, FiTrash2, FiUser, FiShield, FiEye } from 'react-icons/fi';
 const AdminUsers = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+=======
+import { getAllUsers, updateUserRole, deleteUser } from '../../features/adminSlice';
+import { toast } from 'react-toastify';
+import { FiEdit, FiTrash2, FiUser, FiShield } from 'react-icons/fi';
+
+const AdminUsers = () => {
+  const dispatch = useDispatch();
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   const { users, loading } = useSelector((state) => state.admin);
   const { user: currentUser } = useSelector((state) => state.auth);
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,10 +25,13 @@ const AdminUsers = () => {
     dispatch(getAllUsers());
   }, [dispatch]);
 
+<<<<<<< HEAD
   const handleUserClick = (userId) => {
     navigate(`/admin/users/${userId}`);
   };
 
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   const handleRoleUpdate = async (userId, newRole) => {
     try {
       await dispatch(updateUserRole({ userId, role: newRole })).unwrap();
@@ -101,11 +113,15 @@ const AdminUsers = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
+<<<<<<< HEAD
                 <tr 
                   key={user._id} 
                   className="hover:bg-gray-50 cursor-pointer transition-colors"
                   onClick={() => handleUserClick(user._id)}
                 >
+=======
+                <tr key={user._id} className="hover:bg-gray-50">
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
@@ -141,6 +157,7 @@ const AdminUsers = () => {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+<<<<<<< HEAD
                     <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
                       {/* View Details Button */}
                       <button
@@ -158,6 +175,16 @@ const AdminUsers = () => {
                             e.stopPropagation();
                             handleRoleUpdate(user._id, user.role === 'admin' ? 'user' : 'admin');
                           }}
+=======
+                    <div className="flex space-x-2">
+                      {/* Role Toggle */}
+                      {currentUser._id !== user._id && (
+                        <button
+                          onClick={() => handleRoleUpdate(
+                            user._id, 
+                            user.role === 'admin' ? 'user' : 'admin'
+                          )}
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
                           className={`inline-flex items-center px-3 py-1 rounded text-xs font-medium ${
                             user.role === 'admin'
                               ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
@@ -172,10 +199,14 @@ const AdminUsers = () => {
                       {/* Delete Button */}
                       {currentUser._id !== user._id && user.role !== 'admin' && (
                         <button
+<<<<<<< HEAD
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteUser(user._id, user.name);
                           }}
+=======
+                          onClick={() => handleDeleteUser(user._id, user.name)}
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
                           className="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200"
                         >
                           <FiTrash2 className="mr-1 h-3 w-3" />

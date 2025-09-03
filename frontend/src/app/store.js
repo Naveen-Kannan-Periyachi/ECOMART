@@ -6,9 +6,12 @@ import cartReducer from '../features/cartSlice';
 import orderReducer from '../features/orderSlice';
 import bookingReducer from '../features/bookingSlice';
 import adminReducer from '../features/adminSlice';
+<<<<<<< HEAD
 import recommendationsReducer from '../features/recommendationsSlice';
 import notificationReducer from '../features/notificationSlice';
 import negotiationReducer from '../features/negotiationSlice';
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 export const store = configureStore({
   reducer: {
@@ -19,8 +22,11 @@ export const store = configureStore({
     orders: orderReducer,
     bookings: bookingReducer,
     admin: adminReducer,
+<<<<<<< HEAD
     recommendations: recommendationsReducer,
     notifications: notificationReducer,
     negotiations: negotiationReducer,
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   },
 });

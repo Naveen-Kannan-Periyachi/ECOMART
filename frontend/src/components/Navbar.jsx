@@ -67,6 +67,7 @@ import NotificationService from '../services/notificationService.js';
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+<<<<<<< HEAD
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -115,6 +116,9 @@ const Navbar = () => {
       }, 100);
     }
   }, [realTimeNotification, dispatch]);
+=======
+  const { isAuthenticated, user, isAdmin } = useSelector((state) => state.auth);
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
   const handleLogout = () => {
     dispatch(logout());
@@ -299,6 +303,7 @@ const Navbar = () => {
                       Home
                     </NavButton>
 
+<<<<<<< HEAD
                     <NavButton 
                       to="/products" 
                       icon={<Store />}
@@ -592,6 +597,114 @@ const Navbar = () => {
               >
                 Mark all read
               </Button>
+=======
+            {isAuthenticated ? (
+              <>
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
+                  color: '#222',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #ffd200 0%, #f7971e 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} component={Link} to="/dashboard">
+                  Dashboard
+                </Button>
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} component={Link} to="/chats">
+                  Chats
+                </Button>
+                {isAdmin && (
+                  <Button sx={{
+                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                    color: '#fff',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                    transition: 'background 0.3s, transform 0.2s',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
+                      transform: 'scale(1.05)',
+                    },
+                  }} component={Link} to="/admin/dashboard">
+                    Admin Panel
+                  </Button>
+                )}
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
+                  color: '#222',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #38f9d7 0%, #43e97b 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} component={Link} to="/product/new">
+                  List Item
+                </Button>
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #ff5858 0%, #f09819 100%)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #f09819 0%, #ff5858 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} component={Link} to="/login">
+                  Login
+                </Button>
+                <Button sx={{
+                  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
+                  color: '#222',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
+                  transition: 'background 0.3s, transform 0.2s',
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #38f9d7 0%, #43e97b 100%)',
+                    transform: 'scale(1.05)',
+                  },
+                }} component={Link} to="/register">
+                  Register
+                </Button>
+              </>
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
             )}
           </Box>
         </Box>

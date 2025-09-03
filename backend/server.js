@@ -16,9 +16,12 @@ import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+<<<<<<< HEAD
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import negotiationRoutes from './routes/negotiationRoutes.js';
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,9 +91,12 @@ app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
+<<<<<<< HEAD
 app.use('/api', recommendationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/negotiations', negotiationRoutes);
+=======
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 // Error Handling
 app.use(notFound);
@@ -102,6 +108,7 @@ import socketService from './socket/socket.js';
 
 const server = http.createServer(app);
 
+<<<<<<< HEAD
 // Initialize socket with error handling
 try {
   const io = socketService.initialize(server);
@@ -111,6 +118,35 @@ try {
   console.error('❌ Socket.IO initialization failed:', error.message);
   console.log('📡 Continuing without Socket.IO...');
 }
+=======
+
+io.on('connection', (socket) => {
+  console.log('Socket connected:', socket.id);
+  
+  // Join chat room
+  socket.on('join', ({ chatId }) => {
+    socket.join(`chat_${chatId}`);
+    console.log(`Socket ${socket.id} joined chat_${chatId}`);
+  });
+  
+  // Handle typing indicators
+  socket.on('typing', ({ chatId, userId, isTyping }) => {
+    socket.to(`chat_${chatId}`).emit('typing', { userId, isTyping });
+  });
+  
+  // Handle messages (this is mainly for real-time, actual saving is done in routes)
+  socket.on('message', ({ chatId, message }) => {
+    io.to(`chat_${chatId}`).emit('message', message);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected:', socket.id);
+  });
+});
+
+// Expose io to routes for broadcasting
+app.set('io', io);
+>>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 const PORT = process.env.PORT || 5001;
 
