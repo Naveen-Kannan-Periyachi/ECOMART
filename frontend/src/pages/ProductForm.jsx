@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearProductError, createProduct, updateProduct, getProductById } from '../features/productsSlice';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
   Container,
   Paper,
@@ -17,7 +19,6 @@ import {
 } from '@mui/material';
 import { CloudUpload, Clear } from '@mui/icons-material';
 import { api } from '../utils/api';
-import { createProduct } from '../features/productsSlice';
 
 const categories = [
   'Electronics',
@@ -33,13 +34,16 @@ const conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
 const ProductForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.products);
+  const { id } = useParams();
+  const { loading, error, currentProduct } = useSelector((state) => state.products);
+  const [formError, setFormError] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    price: '',
-    rentPricePerDay: '',
+    price: 0,
+    rentPricePerDay: 0,
     category: '',
     condition: '',
     type: 'sell',
@@ -47,12 +51,52 @@ const ProductForm = () => {
     images: [],
   });
 
+  // Load product data if editing
+  useEffect(() => {
+    if (id) {
+      setIsEditMode(true);
+      dispatch(getProductById(id));
+    }
+  }, [id, dispatch]);
+
+  // Populate form when product data is loaded
+  useEffect(() => {
+    if (isEditMode && currentProduct) {
+      setFormData({
+        title: currentProduct.title || '',
+        description: currentProduct.description || '',
+        price: currentProduct.price || 0,
+        rentPricePerDay: currentProduct.rentPricePerDay || 0,
+        category: currentProduct.category || '',
+        condition: currentProduct.condition || '',
+        type: currentProduct.type || 'sell',
+        location: currentProduct.location || '',
+        images: currentProduct.images || [],
+      });
+    }
+  }, [isEditMode, currentProduct]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    // Special handling for price fields
+    if (name === 'price' || name === 'rentPricePerDay') {
+      const numValue = Number(value);
+      // Limit maximum price to prevent overflow
+      if (numValue > 999999) {
+        alert('Price cannot exceed $999,999');
+        return;
+      }
+      setFormData((prev) => ({
+        ...prev,
+        [name]: numValue || 0,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleImageUpload = async (e) => {
@@ -88,9 +132,126 @@ const ProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const resultAction = await dispatch(createProduct(formData));
-    if (createProduct.fulfilled.match(resultAction)) {
-      navigate('/dashboard');
+    
+    console.log('Form submission started');
+    
+    // Clear any previous errors
+    setFormError('');
+    dispatch(clearProductError());
+    
+    // Enhanced validation to match backend requirements exactly
+    if (!formData.title || formData.title.trim().length < 3) {
+      setFormError('Title must be at least 3 characters long');
+      return;
+    }
+    
+    if (formData.title.trim().length > 100) {
+      setFormError('Title cannot exceed 100 characters');
+      return;
+    }
+    
+    if (!formData.description || formData.description.trim().length < 10) {
+      setFormError('Description must be at least 10 characters long');
+      return;
+    }
+    
+    if (formData.description.trim().length > 1000) {
+      setFormError('Description cannot exceed 1000 characters');
+      return;
+    }
+    
+    if (!formData.price || formData.price <= 0) {
+      setFormError('Price must be greater than 0');
+      return;
+    }
+
+    if (formData.price > 999999) {
+      setFormError('Price cannot exceed $999,999');
+      return;
+    }
+    
+    if (!formData.category) {
+      setFormError('Please select a category');
+      return;
+    }
+    
+    if (!formData.condition) {
+      setFormError('Please select a condition');
+      return;
+    }
+    
+    if (!formData.location || formData.location.trim().length === 0) {
+      setFormError('Location is required');
+      return;
+    }
+
+    if (formData.type === 'rent' && formData.rentPricePerDay <= 0) {
+      setFormError('Rent price per day must be greater than 0');
+      return;
+    }
+
+    try {
+      // Prepare clean form data, only include rentPricePerDay for rent type
+      const cleanFormData = {
+        title: formData.title,
+        description: formData.description,
+        price: formData.price,
+        category: formData.category,
+        condition: formData.condition,
+        type: formData.type,
+        location: formData.location,
+        images: formData.images
+      };
+
+      // Only include rentPricePerDay for rent type products
+      if (formData.type === 'rent') {
+        cleanFormData.rentPricePerDay = formData.rentPricePerDay;
+      }
+
+      console.log('All validations passed, submitting product data:', {
+        ...cleanFormData,
+        titleLength: cleanFormData.title.length,
+        descriptionLength: cleanFormData.description.length,
+        priceType: typeof cleanFormData.price,
+        priceValue: cleanFormData.price
+      });
+      console.log('Current Redux error state:', error);
+      
+      let resultAction;
+      if (isEditMode) {
+        resultAction = await dispatch(updateProduct({ id, productData: cleanFormData }));
+      } else {
+        resultAction = await dispatch(createProduct(cleanFormData));
+      }
+      
+      const isSuccess = isEditMode 
+        ? updateProduct.fulfilled.match(resultAction)
+        : createProduct.fulfilled.match(resultAction);
+      
+      if (isSuccess) {
+        toast.success(`Product ${isEditMode ? 'updated' : 'created'} successfully!`);
+        navigate('/dashboard');
+      } else {
+        // Handle validation errors from backend
+        const errorData = resultAction.payload;
+        console.log('Error data received:', errorData);
+        
+        if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
+          const errorMessages = errorData.errors.map(err => 
+            typeof err === 'string' ? err : (err.msg || err.message || 'Validation error')
+          ).join(', ');
+          setFormError(`Validation failed: ${errorMessages}`);
+        } else if (errorData && typeof errorData.message === 'string') {
+          setFormError(errorData.message);
+        } else if (typeof errorData === 'string') {
+          setFormError(errorData);
+        } else {
+          setFormError('Failed to create product. Please try again.');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      setFormError('Failed to create product. Please try again.');
     }
   };
 
@@ -98,12 +259,22 @@ const ProductForm = () => {
     <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          List Your Item
+          {isEditMode ? 'Edit Your Item' : 'List Your Item'}
         </Typography>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+            {typeof error === 'string' ? error : 
+             error?.message || 
+             (error?.errors && Array.isArray(error.errors) ? 
+               error.errors.map(err => typeof err === 'string' ? err : err.msg || err.message || 'Validation error').join(', ') : 
+               'An error occurred')}
+          </Alert>
+        )}
+
+        {formError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {formError}
           </Alert>
         )}
 
@@ -116,6 +287,8 @@ const ProductForm = () => {
             onChange={handleChange}
             margin="normal"
             required
+            helperText={`${formData.title.length}/100 characters (minimum 3 required)`}
+            error={formData.title.length > 0 && formData.title.length < 3}
           />
 
           <TextField
@@ -128,6 +301,8 @@ const ProductForm = () => {
             multiline
             rows={4}
             required
+            helperText={`${formData.description.length}/1000 characters (minimum 10 required)`}
+            error={formData.description.length > 0 && formData.description.length < 10}
           />
 
           <FormControl fullWidth margin="normal">
@@ -149,9 +324,10 @@ const ProductForm = () => {
             label="Price"
             name="price"
             type="number"
-            value={formData.price}
+            value={formData.price || ''}
             onChange={handleChange}
             margin="normal"
+            inputProps={{ min: 0.01, step: 0.01 }}
             required
           />
 
@@ -161,9 +337,10 @@ const ProductForm = () => {
               label="Rent Price Per Day"
               name="rentPricePerDay"
               type="number"
-              value={formData.rentPricePerDay}
+              value={formData.rentPricePerDay || ''}
               onChange={handleChange}
               margin="normal"
+              inputProps={{ min: 0.01, step: 0.01 }}
               required
             />
           )}
@@ -276,7 +453,10 @@ const ProductForm = () => {
             sx={{ mt: 3 }}
             disabled={loading}
           >
-            {loading ? 'Creating...' : 'Create Listing'}
+            {loading 
+              ? (isEditMode ? 'Updating...' : 'Creating...') 
+              : (isEditMode ? 'Update Listing' : 'Create Listing')
+            }
           </Button>
         </Box>
       </Paper>

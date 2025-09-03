@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { ThemeProvider, createTheme } from '@mui/material'
 import { store } from './app/store'
 import { initializeAuth } from './utils/authInit'
+import ErrorBoundary from './components/ErrorBoundary'
 import 'react-toastify/dist/ReactToastify.css'
 import './index.css'
 import App from './App.jsx'
@@ -25,14 +26,16 @@ const theme = createTheme({
 initializeAuth(store).then(() => {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <Router>
-            <App />
-            <ToastContainer />
-          </Router>
-        </ThemeProvider>
-      </Provider>
+      <ErrorBoundary>
+        <Provider store={store}>
+          <ThemeProvider theme={theme}>
+            <Router>
+              <App />
+              <ToastContainer />
+            </Router>
+          </ThemeProvider>
+        </Provider>
+      </ErrorBoundary>
     </StrictMode>
   );
 });

@@ -47,12 +47,14 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     isAuthenticated: false,
+    isAdmin: false,
   },
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
       state.user = null;
       state.isAuthenticated = false;
+      state.isAdmin = false;
       state.error = null;
     },
     clearError: (state) => {
@@ -69,6 +71,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.isAdmin = action.payload.role === 'admin';
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
@@ -82,6 +85,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.isAdmin = action.payload.role === 'admin';
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -95,11 +99,13 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.isAdmin = action.payload.role === 'admin';
       })
       .addCase(getUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.isAuthenticated = false;
+        state.isAdmin = false;
       });
   },
 });

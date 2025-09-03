@@ -18,6 +18,9 @@ const chatSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Add compound unique index to prevent duplicate chats for the same product between same users
+chatSchema.index({ productId: 1, buyerId: 1, sellerId: 1 }, { unique: true });
+
 const messageSchema = new mongoose.Schema({
   chatId: {
     type: mongoose.Schema.Types.ObjectId,

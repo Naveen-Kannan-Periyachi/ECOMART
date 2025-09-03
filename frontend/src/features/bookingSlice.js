@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { api } from '../utils/api';
 
 // Create booking request
 export const createBookingRequest = createAsyncThunk(
   'bookings/createRequest',
   async (bookingData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/bookings', bookingData);
+      const response = await api.post('/api/bookings', bookingData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -19,7 +19,7 @@ export const fetchUserBookings = createAsyncThunk(
   'bookings/fetchUserBookings',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/bookings/mybookings');
+      const response = await api.get('/api/bookings/mybookings');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -32,7 +32,7 @@ export const fetchOwnerBookings = createAsyncThunk(
   'bookings/fetchOwnerBookings',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/bookings/owner');
+      const response = await api.get('/api/bookings/owner');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -45,7 +45,7 @@ export const confirmBooking = createAsyncThunk(
   'bookings/confirm',
   async (bookingId, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/bookings/${bookingId}/confirm`);
+      const response = await api.put(`/api/bookings/${bookingId}/confirm`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -58,7 +58,7 @@ export const cancelBooking = createAsyncThunk(
   'bookings/cancel',
   async (bookingId, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/bookings/${bookingId}/cancel`);
+      const response = await api.put(`/api/bookings/${bookingId}/cancel`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

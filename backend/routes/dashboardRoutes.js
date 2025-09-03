@@ -1,6 +1,8 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 import Product from '../models/productModel.js';
+import Order from '../models/Order.js';
+import Booking from '../models/Booking.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -13,7 +15,17 @@ router.get(
   protect,
   asyncHandler(async (req, res) => {
     // Get user's products
-    const products = await Product.find({ owner: req.user._id });
+    const products = await Product.find({ owner: req.user._id }).sort({ createdAt: -1 });
+
+    // Get user's orders (as buyer)
+    const orders = await Order.find({ buyer: req.user._id })
+      .populate('products', 'title price')
+      .sort({ createdAt: -1 });
+
+    // Get user's bookings (as renter)
+    const bookings = await Booking.find({ renter: req.user._id })
+      .populate('product', 'title rentPricePerDay')
+      .sort({ createdAt: -1 });
 
     // Calculate summary counts
     const summary = {
@@ -29,6 +41,24 @@ router.get(
         sold: products.filter((p) => p.status === 'sold').length,
         rented: products.filter((p) => p.status === 'rented').length,
       },
+      orders: {
+        total: orders.length,
+        byStatus: {
+          pending: orders.filter((o) => o.status === 'pending').length,
+          confirmed: orders.filter((o) => o.status === 'confirmed').length,
+          shipped: orders.filter((o) => o.status === 'shipped').length,
+          cancelled: orders.filter((o) => o.status === 'cancelled').length,
+        }
+      },
+      bookings: {
+        total: bookings.length,
+        byStatus: {
+          requested: bookings.filter((b) => b.status === 'requested').length,
+          confirmed: bookings.filter((b) => b.status === 'confirmed').length,
+          completed: bookings.filter((b) => b.status === 'completed').length,
+          cancelled: bookings.filter((b) => b.status === 'cancelled').length,
+        }
+      }
     };
 
     // Calculate category counts
@@ -47,8 +77,11 @@ router.get(
         email: req.user.email,
         phone: req.user.phone,
         address: req.user.address,
+        role: req.user.role,
       },
       products,
+      orders,
+      bookings,
       summary,
     });
   })

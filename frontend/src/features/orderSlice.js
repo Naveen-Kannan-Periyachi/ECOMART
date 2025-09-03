@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { api } from '../utils/api';
 
 // Create order
 export const createOrder = createAsyncThunk(
   'orders/createOrder',
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/api/orders', orderData);
+      const response = await api.post('/api/orders', orderData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -19,7 +19,7 @@ export const fetchOrderDetails = createAsyncThunk(
   'orders/fetchOrderDetails',
   async (orderId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/orders/${orderId}`);
+      const response = await api.get(`/api/orders/${orderId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -32,7 +32,7 @@ export const fetchMyOrders = createAsyncThunk(
   'orders/fetchMyOrders',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/orders/myorders');
+      const response = await api.get('/api/orders/my-orders');
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -45,7 +45,7 @@ export const updateOrderToPaid = createAsyncThunk(
   'orders/updateOrderToPaid',
   async ({ orderId, paymentResult }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/orders/${orderId}/pay`, paymentResult);
+      const response = await api.put(`/api/orders/${orderId}/pay`, paymentResult);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

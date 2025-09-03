@@ -1,7 +1,9 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 import Product from '../models/productModel.js';
+import Activity from '../models/Activity.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validateProduct, validateObjectId } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -11,6 +13,7 @@ const router = express.Router();
 router.post(
   '/',
   protect,
+  validateProduct,
   asyncHandler(async (req, res) => {
     const {
       title,
@@ -88,6 +91,114 @@ router.get(
   })
 );
 
+// @desc    Get trending products
+// @route   GET /api/products/trending
+// @access  Public
+router.get(
+  '/trending',
+  asyncHandler(async (req, res) => {
+    const limit = parseInt(req.query.limit) || 10;
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const trendingProducts = await Activity.aggregate([
+      {
+        $match: {
+          action: { $in: ['viewed', 'bought', 'rented'] },
+          createdAt: { $gte: thirtyDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: '$productId',
+          viewCount: {
+            $sum: {
+              $cond: [{ $eq: ['$action', 'viewed'] }, 1, 0]
+            }
+          },
+          buyCount: {
+            $sum: {
+              $cond: [{ $eq: ['$action', 'bought'] }, 3, 0] // Weight purchases higher
+            }
+          },
+          rentCount: {
+            $sum: {
+              $cond: [{ $eq: ['$action', 'rented'] }, 2, 0] // Weight rentals moderately
+            }
+          }
+        }
+      },
+      {
+        $addFields: {
+          trendScore: {
+            $add: ['$viewCount', '$buyCount', '$rentCount']
+          }
+        }
+      },
+      {
+        $sort: { trendScore: -1 }
+      },
+      {
+        $limit: limit
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      {
+        $unwind: '$product'
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'product.owner',
+          foreignField: '_id',
+          as: 'product.owner',
+          pipeline: [
+            { $project: { name: 1, email: 1 } }
+          ]
+        }
+      },
+      {
+        $unwind: '$product.owner'
+      },
+      {
+        $addFields: {
+          'product.trendScore': '$trendScore'
+        }
+      },
+      {
+        $replaceRoot: { newRoot: '$product' }
+      }
+    ]);
+
+    // If no trending products, get recent popular products
+    if (trendingProducts.length < limit) {
+      const recentProducts = await Product.find({
+        _id: { $nin: trendingProducts.map(p => p._id) }
+      })
+      .populate('owner', 'name email')
+      .sort({ createdAt: -1, views: -1 })
+      .limit(limit - trendingProducts.length);
+
+      res.json({
+        success: true,
+        count: [...trendingProducts, ...recentProducts].length,
+        data: [...trendingProducts, ...recentProducts]
+      });
+    } else {
+      res.json({
+        success: true,
+        count: trendingProducts.length,
+        data: trendingProducts
+      });
+    }
+  })
+);
+
 // @desc    Get product by ID
 // @route   GET /api/products/:id
 // @access  Public
@@ -100,9 +211,6 @@ router.get(
     );
 
     if (product) {
-      // Increment views
-      product.views = (product.views || 0) + 1;
-      await product.save();
       res.json(product);
     } else {
       res.status(404);
@@ -117,6 +225,7 @@ router.get(
 router.put(
   '/:id',
   protect,
+  validateProduct,
   asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
 
@@ -126,16 +235,34 @@ router.put(
         throw new Error('Not authorized to update this product');
       }
 
-      product.title = req.body.title || product.title;
-      product.description = req.body.description || product.description;
-      product.price = req.body.price || product.price;
-      product.rentPricePerDay = req.body.rentPricePerDay || product.rentPricePerDay;
-      product.category = req.body.category || product.category;
-      product.condition = req.body.condition || product.condition;
-      product.type = req.body.type || product.type;
-      product.images = req.body.images || product.images;
-      product.location = req.body.location || product.location;
-      product.status = req.body.status || product.status;
+      // Update only provided fields
+      const {
+        title,
+        description,
+        price,
+        rentPricePerDay,
+        category,
+        condition,
+        type,
+        images,
+        location,
+        status,
+      } = req.body;
+
+      product.title = title || product.title;
+      product.description = description || product.description;
+      product.price = price !== undefined ? price : product.price;
+      product.category = category || product.category;
+      product.condition = condition || product.condition;
+      product.type = type || product.type;
+      product.images = images || product.images;
+      product.location = location || product.location;
+      product.status = status || product.status;
+
+      // Handle rentPricePerDay conditionally
+      if (type === 'rent' || product.type === 'rent') {
+        product.rentPricePerDay = rentPricePerDay !== undefined ? rentPricePerDay : product.rentPricePerDay;
+      }
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);

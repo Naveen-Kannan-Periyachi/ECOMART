@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
@@ -10,8 +10,10 @@ import {
   CardContent,
   Chip,
   Button,
+  Grid
 } from '@mui/material';
 import { getDashboardData } from '../features/dashboardSlice';
+import ProductCard from '../components/ui/ProductCard';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -35,21 +37,21 @@ const Dashboard = () => {
   }
 
   return (
-    <Container maxWidth={false} sx={{ 
-      height: '100vh', 
+    <Container maxWidth={false} sx={{
+      height: '100vh',
       p: 0,
       bgcolor: '#f5f5f5',
       overflow: 'auto'
     }}>
-      <Box sx={{ 
+      <Box sx={{
         py: 3,
         px: { xs: 2, sm: 3 },
         minHeight: '100%'
       }}>
-        <Typography 
-          variant="h4" 
-          gutterBottom 
-          sx={{ 
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{
             fontWeight: 'bold',
             color: '#1976d2',
             mb: 3
@@ -58,10 +60,10 @@ const Dashboard = () => {
         </Typography>
 
         {/* Profile Section */}
-        <Paper 
+        <Paper
           elevation={0}
-          sx={{ 
-            p: 3, 
+          sx={{
+            p: 3,
             mb: 4,
             borderRadius: 3,
             bgcolor: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)',
@@ -71,8 +73,8 @@ const Dashboard = () => {
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'medium' }}>
             Profile Information
           </Typography>
-          <Box 
-            display="grid" 
+          <Box
+            display="grid"
             gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }}
             gap={2}
           >
@@ -103,10 +105,10 @@ const Dashboard = () => {
         </Paper>
 
         {/* Summary Section */}
-        <Paper 
+        <Paper
           elevation={0}
-          sx={{ 
-            p: 3, 
+          sx={{
+            p: 3,
             mb: 4,
             borderRadius: 2,
             bgcolor: 'background.paper'
@@ -114,9 +116,9 @@ const Dashboard = () => {
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'medium' }}>
             Summary
           </Typography>
-          <Box 
-            display="grid" 
-            gridTemplateColumns={{ 
+          <Box
+            display="grid"
+            gridTemplateColumns={{
               xs: '1fr',
               sm: 'repeat(3, 1fr)'
             }}
@@ -176,9 +178,9 @@ const Dashboard = () => {
         </Paper>
 
         {/* Products Section */}
-        <Paper 
+        <Paper
           elevation={0}
-          sx={{ 
+          sx={{
             p: 3,
             borderRadius: 2,
             bgcolor: 'background.paper'
@@ -205,78 +207,38 @@ const Dashboard = () => {
             </Button>
           </Box>
 
-          <Box 
-            display="grid"
-            gridTemplateColumns={{
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)'
-            }}
-            gap={3}
-          >
-            {products?.map((product) => (
-              <Card 
-                key={product._id}
-                sx={{ 
-                  height: '100%',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 3
-                  }
+          <div className="product-grid-container" data-product-grid>
+            {products && products.length > 0 ? (
+              products.map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  variant="compact"
+                  showActions={true}
+                  showOwnerActions={true}
+                />
+              ))
+            ) : (
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  py: 4,
+                  color: 'text.secondary'
                 }}
               >
-                <CardContent>
-                  <Typography variant="h6" noWrap>
-                    {product.title}
-                  </Typography>
-                  <Box sx={{ mt: 1 }}>
-                    <Chip
-                      label={product.type.toUpperCase()}
-                      color="primary"
-                      size="small"
-                      sx={{ mr: 1 }}
-                    />
-                    <Chip
-                      label={product.status.toUpperCase()}
-                      color={
-                        product.status === 'available'
-                          ? 'success'
-                          : product.status === 'sold'
-                          ? 'error'
-                          : 'warning'
-                      }
-                      size="small"
-                    />
-                  </Box>
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    Category: {product.category}
-                  </Typography>
-                  <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
-                    ${product.price}
-                    {product.type === 'rent' &&
-                      ` / $${product.rentPricePerDay} per day`}
-                  </Typography>
-                  <Button
-                    component={Link}
-                    to={`/product/${product._id}`}
-                    variant="outlined"
-                    fullWidth
-                    sx={{ 
-                      mt: 2,
-                      textTransform: 'none'
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
+                <Typography variant="h6" gutterBottom>
+                  No products yet
+                </Typography>
+                <Typography variant="body2">
+                  Click "Add New Listing" to create your first product.
+                </Typography>
+              </Box>
+            )}
+          </div>
         </Paper>
       </Box>
     </Container>
   );
 };
 
-export default Dashboard;
+export default memo(Dashboard);

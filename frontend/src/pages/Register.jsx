@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -9,6 +9,7 @@ import {
   Typography,
   Box,
   Alert,
+  Stack,
 } from '@mui/material';
 import { register } from '../features/authSlice';
 
@@ -58,16 +59,44 @@ const Register = () => {
     }
   };
 
+  // Check if error is about user already existing
+  const isUserExistsError = error && error.toLowerCase().includes('user already exists');
+
   return (
     <Container maxWidth="sm">
-  <Paper elevation={3} sx={{ p: 4, mt: 4, background: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)', boxShadow: '0 4px 24px 0 rgba(31,38,135,0.12)', borderRadius: 3, animation: 'fadeIn 0.8s' }}>
-        <Typography variant="h4" gutterBottom>
+      <Paper elevation={3} sx={{ p: 4, mt: 4, background: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)', boxShadow: '0 4px 24px 0 rgba(31,38,135,0.12)', borderRadius: 3, animation: 'fadeIn 0.8s' }}>
+        <Typography variant="h4" gutterBottom align="center">
           Register
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+          <Alert 
+            severity={isUserExistsError ? "warning" : "error"} 
+            sx={{ mb: 2 }}
+            action={
+              isUserExistsError && (
+                <Button 
+                  component={Link} 
+                  to="/login" 
+                  color="inherit" 
+                  size="small"
+                  sx={{ fontWeight: 'bold' }}
+                >
+                  Login Instead
+                </Button>
+              )
+            }
+          >
+            <Stack spacing={1}>
+              <Typography variant="body2">
+                {error}
+              </Typography>
+              {isUserExistsError && (
+                <Typography variant="caption">
+                  This email is already registered. Try logging in or use a different email.
+                </Typography>
+              )}
+            </Stack>
           </Alert>
         )}
 
@@ -80,6 +109,12 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            error={isUserExistsError && formData.email === 'admin@ecomart.com'}
+            helperText={
+              isUserExistsError && formData.email === 'admin@ecomart.com' 
+                ? "This is the admin email. Use a different email for user registration."
+                : ""
+            }
           />
 
           <TextField
@@ -91,6 +126,12 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            error={isUserExistsError}
+            helperText={
+              isUserExistsError 
+                ? "This email is already registered. Try a different email or login instead."
+                : ""
+            }
           />
 
           <TextField
@@ -185,6 +226,23 @@ const Register = () => {
           >
             {loading ? 'Registering...' : 'Register'}
           </Button>
+
+          {isUserExistsError && (
+            <Box sx={{ mt: 2, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                Already have an account?{' '}
+                <Button 
+                  component={Link} 
+                  to="/login" 
+                  variant="text" 
+                  size="small"
+                  sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                >
+                  Login here
+                </Button>
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Paper>
     </Container>

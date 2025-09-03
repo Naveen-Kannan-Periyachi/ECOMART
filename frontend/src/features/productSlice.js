@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { api } from '../utils/api';
 
 // Fetch products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/products', { params });
+      const response = await api.get('/products', { params });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -19,7 +19,7 @@ export const fetchProductDetails = createAsyncThunk(
   'products/fetchProductDetails',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/products/${id}`);
+      const response = await api.get(`/products/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -32,17 +32,12 @@ export const createProduct = createAsyncThunk(
   'products/createProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-      for (const [key, value] of Object.entries(productData)) {
-        if (key === 'images') {
-          value.forEach(file => formData.append('images', file));
-        } else {
-          formData.append(key, value);
-        }
-      }
+      console.log('Creating FormData from:', productData);
       
-      const response = await axios.post('/api/products', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      // Temporarily send as JSON instead of FormData to debug the URL issue
+      console.log('Making API call to /products');
+      const response = await api.post('/products', productData, {
+        headers: { 'Content-Type': 'application/json' },
       });
       return response.data;
     } catch (error) {

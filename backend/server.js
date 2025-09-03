@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import { upload } from './middleware/uploadMiddleware.js';
+import { createAdminIfNotExists } from './utils/adminSeed.js';
 
 // Routes
 import authRoutes from './routes/authRoutes.js';
@@ -14,6 +15,10 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import negotiationRoutes from './routes/negotiationRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,12 +47,15 @@ if (!process.env.MONGODB_URI) {
 
 connectDB();
 
+// Create admin user if none exists
+createAdminIfNotExists();
+
 const app = express();
 
 // Configure CORS
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
@@ -63,6 +71,15 @@ app.post('/api/upload', upload.array('images', 5), (req, res) => {
 });
 
 // API Routes
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'API is working correctly', 
+    timestamp: new Date().toISOString(),
+    baseUrl: req.baseUrl,
+    originalUrl: req.originalUrl,
+    url: req.url
+  });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -70,6 +87,10 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api', recommendationRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/negotiations', negotiationRoutes);
 
 // Error Handling
 app.use(notFound);
@@ -77,37 +98,31 @@ app.use(errorHandler);
 
 
 import http from 'http';
-import { Server as SocketIOServer } from 'socket.io';
+import socketService from './socket/socket.js';
 
 const server = http.createServer(app);
-const io = new SocketIOServer(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
-});
 
-
-io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
-  socket.on('join', ({ chatId }) => {
-    socket.join(`room_${chatId}`);
-  });
-  socket.on('message', ({ chatId, message }) => {
-    io.to(`room_${chatId}`).emit('message', message);
-  });
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
-  });
-});
-
-// Expose io to routes for broadcasting
-app.set('io', io);
+// Initialize socket with error handling
+try {
+  const io = socketService.initialize(server);
+  app.set('io', io);
+  console.log('✅ Socket.IO initialized successfully');
+} catch (error) {
+  console.error('❌ Socket.IO initialization failed:', error.message);
+  console.log('📡 Continuing without Socket.IO...');
+}
 
 const PORT = process.env.PORT || 5001;
-server.listen(PORT, () => {
+
+// Add request logging middleware for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Server accessible at http://localhost:${PORT}`);
   console.log('Environment variables loaded:', {
     PORT: process.env.PORT,
     NODE_ENV: process.env.NODE_ENV,

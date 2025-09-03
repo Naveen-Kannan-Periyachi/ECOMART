@@ -21,33 +21,54 @@ router.post(
   asyncHandler(async (req, res) => {
     const { name, email, password, phone, address } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !password || !phone) {
+      res.status(400);
+      throw new Error('Please provide all required fields: name, email, password, and phone');
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       res.status(400);
-      throw new Error('User already exists');
+      // Check if it's the admin email
+      if (email === 'admin@ecomart.com') {
+        throw new Error('This is the admin email. Please use a different email for user registration or login as admin.');
+      } else {
+        throw new Error('User already exists with this email. Please use a different email or try logging in.');
+      }
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      phone,
-      address,
-    });
-
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        address: user.address,
-        token: generateToken(user._id),
+    try {
+      const user = await User.create({
+        name,
+        email,
+        password,
+        phone,
+        address,
       });
-    } else {
-      res.status(400);
-      throw new Error('Invalid user data');
+
+      if (user) {
+        res.status(201).json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          role: user.role,
+          token: generateToken(user._id),
+        });
+      } else {
+        res.status(400);
+        throw new Error('Failed to create user account. Please check your information and try again.');
+      }
+    } catch (error) {
+      if (error.code === 11000) {
+        // MongoDB duplicate key error
+        res.status(400);
+        throw new Error('An account with this email already exists. Please use a different email.');
+      }
+      throw error;
     }
   })
 );
@@ -99,6 +120,7 @@ router.post(
         email: user.email,
         phone: user.phone,
         address: user.address,
+        role: user.role,
         token: token
       });
     } catch (error) {
@@ -139,6 +161,7 @@ router.get(
         email: user.email,
         phone: user.phone,
         address: user.address,
+        role: user.role,
       });
     } else {
       res.status(404);
