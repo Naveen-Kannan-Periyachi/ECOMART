@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 import React, { useEffect, useState, useRef, useCallback, memo } from 'react';
-=======
-import React, { useEffect, useState, useRef, useCallback } from 'react';
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Box,
   Typography,
@@ -36,11 +32,14 @@ import {
 } from '@mui/icons-material';
 import { io } from 'socket.io-client';
 import { api } from '../utils/api';
+import { markNotificationAsRead, fetchUnreadCount } from '../features/notificationSlice';
 
 const Chat = () => {
   const { chatId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { notifications } = useSelector((state) => state.notifications);
   
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -80,21 +79,25 @@ const Chat = () => {
   const playNotificationSound = useCallback(() => {
     if (soundEnabled) {
       // Create a simple notification sound
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+      } catch {
+        console.log('Audio notification not supported');
+      }
     }
   }, [soundEnabled]);
 
@@ -102,8 +105,8 @@ const Chat = () => {
     if ('Notification' in window && Notification.permission === 'granted' && !isPageVisible) {
       const notification = new Notification(`New message from ${sender}`, {
         body: message,
-        icon: '/vite.svg', // You can replace with your app icon
-        tag: chatId, // Prevent duplicate notifications
+        icon: '/vite.svg',
+        tag: chatId,
       });
 
       notification.onclick = () => {
@@ -111,7 +114,6 @@ const Chat = () => {
         notification.close();
       };
 
-      // Auto close after 5 seconds
       setTimeout(() => notification.close(), 5000);
     }
   }, [chatId, isPageVisible]);
@@ -126,11 +128,6 @@ const Chat = () => {
   // Initialize Socket.IO connection
   useEffect(() => {
     if (!user || !chatId) return;
-
-<<<<<<< HEAD
-    console.log('Initializing socket connection for chat:', chatId);
-    console.log('User:', user);
-    console.log('Token:', localStorage.getItem('token') ? 'exists' : 'not found');
 
     const newSocket = io('http://localhost:5001', {
       auth: {
@@ -149,47 +146,21 @@ const Chat = () => {
     });
 
     newSocket.on('message', (newMessage) => {
-      console.log('Received new message:', newMessage);
-=======
-    const newSocket = io('http://localhost:5001', {
-      auth: {
-        token: localStorage.getItem('token')
-      }
-    });
-
-    newSocket.on('connect', () => {
-      console.log('Connected to chat server');
-      newSocket.emit('join', { chatId });
-    });
-
-    newSocket.on('message', (newMessage) => {
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
-      // Check if message is from another user
       const isFromOtherUser = newMessage.senderId !== user._id;
       
       setMessages(prev => {
-        // Check for duplicates before adding
         const isDuplicate = prev.some(msg => 
           msg._id === newMessage._id || 
           (msg.content === newMessage.content && msg.senderId === newMessage.senderId)
         );
         
         if (isDuplicate) {
-<<<<<<< HEAD
-          console.log('Duplicate message detected, skipping');
           return prev;
         }
         
-        console.log('Adding new message to state');
-=======
-          return prev;
-        }
-        
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
         return [...prev, newMessage];
       });
       
-      // Show notifications only for messages from other users
       if (isFromOtherUser) {
         playNotificationSound();
         showBrowserNotification(newMessage.content, newMessage.senderName || 'Someone');
@@ -200,10 +171,6 @@ const Chat = () => {
     });
 
     newSocket.on('typing', ({ userId, isTyping: typing }) => {
-<<<<<<< HEAD
-      console.log('Typing event received:', { userId, typing });
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       if (userId !== user._id) {
         setIsTyping(typing);
       }
@@ -216,10 +183,6 @@ const Chat = () => {
     setSocket(newSocket);
 
     return () => {
-<<<<<<< HEAD
-      console.log('Cleaning up socket connection');
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       newSocket.disconnect();
     };
   }, [user, chatId, playNotificationSound, showBrowserNotification, showInAppNotification]);
@@ -234,11 +197,9 @@ const Chat = () => {
         const response = await api.get(`/chat/${chatId}`);
         setMessages(response.data);
         
-        // Get chat info to determine other user
         const chatResponse = await api.get(`/chat/${chatId}/info`);
         setChatInfo(chatResponse.data);
         
-        // Determine the other user in the chat
         const otherUserId = chatResponse.data.buyerId === user._id 
           ? chatResponse.data.sellerId 
           : chatResponse.data.buyerId;
@@ -261,7 +222,29 @@ const Chat = () => {
     fetchMessages();
   }, [chatId, user]);
 
-  // Auto-scroll to bottom
+  // Mark chat-related notifications as read when entering chat
+  useEffect(() => {
+    if (!chatId || !notifications || !user) return;
+
+    // Find unread notifications related to this chat
+    const chatRelatedNotifications = notifications.filter(notification => {
+      return !notification.isRead && 
+             notification.type === 'NEW_MESSAGE' &&
+             notification.actionUrl && 
+             notification.actionUrl.includes(chatId);
+    });
+
+    // Mark each chat-related notification as read
+    chatRelatedNotifications.forEach(notification => {
+      dispatch(markNotificationAsRead(notification._id));
+    });
+
+    // Update unread count
+    if (chatRelatedNotifications.length > 0) {
+      dispatch(fetchUnreadCount());
+    }
+  }, [chatId, notifications, dispatch, user]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -270,7 +253,6 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Handle typing indicators
   const handleTyping = () => {
     if (!socket) return;
 
@@ -293,37 +275,19 @@ const Chat = () => {
     setSending(true);
 
     try {
-<<<<<<< HEAD
-      console.log('Sending message:', messageContent);
-      const response = await api.post(`/chat/${chatId}/message`, {
-        content: messageContent
-      });
-      
-      console.log('Message sent successfully:', response.data);
-      
-=======
       await api.post(`/chat/${chatId}/message`, {
         content: messageContent
       });
       
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
-      // Don't add optimistically - let Socket.IO handle it to avoid duplicates
-      // The backend will emit the message via Socket.IO
-      
-      // Stop typing indicator
       if (socket) {
         socket.emit('typing', { chatId, userId: user._id, isTyping: false });
       }
       
     } catch (err) {
-<<<<<<< HEAD
       console.error('Error sending message:', err);
       const errorMessage = err.response?.data?.message || 'Failed to send message';
       alert(errorMessage);
-=======
-      alert(err.response?.data?.message || 'Failed to send message');
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
-      setInput(messageContent); // Restore message on error
+      setInput(messageContent);
     } finally {
       setSending(false);
       inputRef.current?.focus();

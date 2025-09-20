@@ -33,26 +33,45 @@ const NegotiationDialog = ({
   onNegotiationStarted 
 }) => {
   const dispatch = useDispatch();
-  const [proposedPrice, setProposedPrice] = useState(Math.round(product?.price * 0.85) || 0);
+  const [proposedPrice, setProposedPrice] = useState(0);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Initialize price when product changes or dialog opens
+  React.useEffect(() => {
+    if (product?.price && open) {
+      const initialPrice = Math.round(product.price * 0.85);
+      setProposedPrice(initialPrice);
+    }
+  }, [product?.price, open]);
+
   const handleSliderChange = (event, newValue) => {
-    setProposedPrice(newValue);
+    const price = Number(newValue);
+    setProposedPrice(price);
+    setError(''); // Clear any validation errors
   };
 
   const handleInputChange = (event) => {
-    const value = parseFloat(event.target.value) || 0;
-    setProposedPrice(Math.min(Math.max(value, 1), product.price - 1));
+    const value = Number(event.target.value);
+    if (!isNaN(value) && value >= 0) {
+      const maxPrice = product?.price || 0;
+      const clampedValue = Math.min(Math.max(value, 0), maxPrice - 1);
+      setProposedPrice(clampedValue);
+      setError(''); // Clear any validation errors
+    }
+  };
+
+  const isValidOffer = () => {
+    if (!product?.price || proposedPrice <= 0) return false;
+    if (proposedPrice >= product.price) return false;
+    // Allow offers that are reasonable (at least 10% less than original)
+    return proposedPrice <= product.price * 0.95;
   };
 
   const handleSubmit = async () => {
-    if (!product) return;
-
-    const validation = NegotiationService.validateNegotiationData(product.price, proposedPrice);
-    if (!validation.isValid) {
-      setError(validation.errors.join(', '));
+    if (!product || !isValidOffer()) {
+      setError('Please enter a valid offer amount');
       return;
     }
 
@@ -62,22 +81,28 @@ const NegotiationDialog = ({
     try {
       await dispatch(startNegotiation({
         productId: product._id,
-        proposedPrice,
-        message
+        proposedPrice: Number(proposedPrice),
+        message: message.trim()
       })).unwrap();
 
       if (onNegotiationStarted) {
         onNegotiationStarted();
       }
       
-      onClose();
-      setProposedPrice(Math.round(product.price * 0.85));
-      setMessage('');
+      handleClose();
     } catch (err) {
-      setError(err);
+      console.error('Negotiation error:', err);
+      setError(typeof err === 'string' ? err : 'Failed to start negotiation. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    setProposedPrice(product?.price ? Math.round(product.price * 0.85) : 0);
+    setMessage('');
+    setError('');
+    onClose();
   };
 
   const suggestedPrices = product ? NegotiationService.getSuggestedPrices(product.price) : [];
@@ -154,18 +179,29 @@ const NegotiationDialog = ({
               </Typography>
               
               <Slider
-                value={proposedPrice}
+                value={proposedPrice || 0}
                 onChange={handleSliderChange}
-                min={Math.round(product.price * 0.1)}
-                max={product.price - 1}
+                min={product ? Math.round(product.price * 0.1) : 1}
+                max={product ? Math.round(product.price * 0.95) : 100}
                 step={1}
-                marks={[
+                marks={product ? [
                   { value: Math.round(product.price * 0.1), label: '10%' },
                   { value: Math.round(product.price * 0.5), label: '50%' },
-                  { value: Math.round(product.price * 0.9), label: '90%' },
-                ]}
+                  { value: Math.round(product.price * 0.85), label: '85%' },
+                ] : []}
                 valueLabelDisplay="auto"
                 valueLabelFormat={(value) => `$${value}`}
+                sx={{
+                  '& .MuiSlider-thumb': {
+                    backgroundColor: '#FE6B8B',
+                  },
+                  '& .MuiSlider-track': {
+                    backgroundColor: '#FE6B8B',
+                  },
+                  '& .MuiSlider-rail': {
+                    backgroundColor: '#ddd',
+                  }
+                }}
               />
             </Grid>
           </Grid>
@@ -243,15 +279,24 @@ const NegotiationDialog = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={loading || proposedPrice >= product.price || proposedPrice <= 0}
+          disabled={!isValidOffer() || loading}
           sx={{
-            background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+            background: isValidOffer() && !loading
+              ? 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+              : 'rgba(0,0,0,0.12)',
+            color: isValidOffer() && !loading ? 'white' : 'rgba(0,0,0,0.26)',
             '&:hover': {
-              background: 'linear-gradient(45deg, #FE6B8B 60%, #FF8E53 100%)',
+              background: isValidOffer() && !loading
+                ? 'linear-gradient(45deg, #FE6B8B 60%, #FF8E53 100%)'
+                : 'rgba(0,0,0,0.12)',
+            },
+            '&:disabled': {
+              background: 'rgba(0,0,0,0.12)',
+              color: 'rgba(0,0,0,0.26)'
             }
           }}
         >
-          {loading ? 'Starting Negotiation...' : `Offer $${proposedPrice}`}
+          {loading ? 'Starting Negotiation...' : `Offer $${proposedPrice || 0}`}
         </Button>
       </DialogActions>
     </Dialog>

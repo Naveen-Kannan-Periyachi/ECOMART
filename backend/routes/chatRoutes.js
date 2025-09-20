@@ -12,7 +12,6 @@ const router = express.Router();
 // Start chat (or get existing)
 router.post('/start', protect, asyncHandler(async (req, res) => {
   const { productId } = req.body;
-<<<<<<< HEAD
   
   // Validate input
   if (!productId) {
@@ -147,25 +146,9 @@ router.get('/:chatId/info', protect, asyncHandler(async (req, res) => {
     .populate('sellerId', 'name email')
     .populate('productId', 'title price images');
 
-=======
-  if (!productId) return res.status(400).json({ message: 'Product ID required' });
-  
-  const product = await Product.findById(productId);
-  if (!product) return res.status(404).json({ message: 'Product not found' });
-  
-  const sellerId = product.owner;
-  const buyerId = req.user._id;
-  
-  if (sellerId.toString() === buyerId.toString()) {
-    return res.status(400).json({ message: 'Cannot start chat with yourself' });
-  }
-  
-  let chat = await Chat.findOne({ productId, buyerId, sellerId });
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   if (!chat) {
     return res.status(404).json({ message: 'Chat not found' });
   }
-<<<<<<< HEAD
 
   // Check if user is part of this chat
   if (chat.buyerId._id.toString() !== req.user._id.toString() && 
@@ -200,10 +183,8 @@ router.get('/:chatId/info', protect, asyncHandler(async (req, res) => {
   };
 
   res.json(chatInfo);
-=======
   
   res.json(chat);
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 }));
 
 // Get chat info with populated data
@@ -320,35 +301,24 @@ router.post('/:chatId/message', protect, canAccessChat, asyncHandler(async (req,
   // Update chat's updatedAt timestamp
   await Chat.findByIdAndUpdate(req.params.chatId, { updatedAt: new Date() });
 
-<<<<<<< HEAD
   // Get product info for notification
   const product = await Product.findById(req.chat.productId);
   
   // Create notification for message recipient
   try {
     const notificationService = new NotificationService(req.app.get('io'));
-    await notificationService.createNotification({
-      userId: receiverId,
-      type: 'NEW_MESSAGE',
-      title: 'New Message',
-      message: `${req.user.name} sent you a message about "${product?.title || 'product'}"`,
-      data: {
-        chatId: req.params.chatId,
-        productId: req.chat.productId,
-        senderId: senderId,
-        senderName: req.user.name,
-        messagePreview: content.trim().substring(0, 50) + (content.trim().length > 50 ? '...' : '')
-      },
-      priority: 'MEDIUM',
-      actionUrl: `/chat/${req.params.chatId}`
-    });
+    await notificationService.createMessageNotification(
+      senderId,
+      receiverId,
+      req.params.chatId,
+      content.trim(),
+      product // Pass product data for email
+    );
   } catch (notificationError) {
     console.error('Failed to create message notification:', notificationError);
     // Don't fail the message sending if notification fails
   }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   // Socket.io broadcast (if available)
   if (req.app.get('io')) {
     req.app.get('io').to(`chat_${req.params.chatId}`).emit('message', formattedMessage);

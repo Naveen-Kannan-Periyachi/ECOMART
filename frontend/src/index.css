@@ -172,7 +172,6 @@ select {
   animation: fadeIn 0.6s ease-in-out;
 }
 
-<<<<<<< HEAD
 .fade-in-up {
   animation: fadeInUp 0.6s ease-out;
 }
@@ -185,19 +184,14 @@ select {
   animation: fadeInRight 0.6s ease-out;
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 .slide-up {
   animation: slideUp 0.6s ease-out;
 }
 
-<<<<<<< HEAD
 .slide-down {
   animation: slideDown 0.6s ease-out;
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 .scale-in {
   animation: scaleIn 0.4s ease-out;
 }
@@ -206,7 +200,6 @@ select {
   animation: bounceIn 0.8s ease-out;
 }
 
-<<<<<<< HEAD
 .zoom-in {
   animation: zoomIn 0.5s ease-out;
 }
@@ -231,8 +224,6 @@ select {
   animation: heartBeat 1.3s ease-in-out infinite;
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 .glass-effect {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
@@ -259,7 +250,6 @@ select {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
-<<<<<<< HEAD
 .shadow-colored {
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
@@ -427,8 +417,6 @@ select {
   height: 300px;
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 /* Loading Animations */
 .spinner {
   width: 40px;
@@ -488,7 +476,6 @@ img {
   }
 }
 
-<<<<<<< HEAD
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -522,8 +509,6 @@ img {
   }
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -535,7 +520,6 @@ img {
   }
 }
 
-<<<<<<< HEAD
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -547,8 +531,6 @@ img {
   }
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 @keyframes scaleIn {
   from {
     opacity: 0;
@@ -616,7 +598,6 @@ img {
   }
 }
 
-<<<<<<< HEAD
 @keyframes glow {
   0%,
   100% {
@@ -678,8 +659,6 @@ img {
   }
 }
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 /* Responsive Design Enhancements */
 @media (max-width: 768px) {
   html {

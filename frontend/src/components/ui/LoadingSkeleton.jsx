@@ -7,26 +7,47 @@ import {
 } from '@mui/material';
 
 const ProductSkeleton = () => (
-  <Card className="product-loading-skeleton">
+  <Card className="product-loading-skeleton product-card" sx={{ 
+    minHeight: '380px',
+    maxHeight: '380px',
+    display: 'flex',
+    flexDirection: 'column'
+  }}>
     <Skeleton 
       variant="rectangular" 
-      height={200} 
-      sx={{ borderRadius: '16px 16px 0 0' }} 
+      height={160} 
+      sx={{ 
+        borderRadius: '0',
+        flexShrink: 0
+      }} 
     />
-    <CardContent sx={{ p: 2.5 }}>
-      <Skeleton variant="text" height={28} sx={{ mb: 1 }} />
-      <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
-        <Skeleton variant="rectangular" width={60} height={20} sx={{ borderRadius: 1 }} />
-        <Skeleton variant="rectangular" width={50} height={20} sx={{ borderRadius: 1 }} />
+    <CardContent sx={{ 
+      p: 2,
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between'
+    }}>
+      {/* Header Section */}
+      <Box>
+        <Skeleton variant="text" height={24} sx={{ mb: 1, fontSize: '1rem' }} />
+        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+          <Skeleton variant="rectangular" width={60} height={18} sx={{ borderRadius: 1 }} />
+          <Skeleton variant="rectangular" width={50} height={18} sx={{ borderRadius: 1 }} />
+        </Box>
+        <Skeleton variant="text" height={14} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" height={14} width="80%" sx={{ mb: 1 }} />
       </Box>
-      <Skeleton variant="text" height={16} sx={{ mb: 0.5 }} />
-      <Skeleton variant="text" height={16} width="80%" sx={{ mb: 2 }} />
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-        <Skeleton variant="text" width={60} height={24} />
-        <Skeleton variant="rectangular" width={80} height={16} sx={{ borderRadius: 1 }} />
+      
+      {/* Footer Section */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Skeleton variant="text" width={60} height={20} />
+          <Skeleton variant="rectangular" width={60} height={14} sx={{ borderRadius: 1 }} />
+        </Box>
+        <Skeleton variant="rectangular" height={28} sx={{ borderRadius: 1, mb: 0.5 }} />
+        <Skeleton variant="rectangular" height={28} sx={{ borderRadius: 1 }} />
       </Box>
-      <Skeleton variant="rectangular" height={32} sx={{ borderRadius: 2, mb: 1 }} />
-      <Skeleton variant="rectangular" height={32} sx={{ borderRadius: 2 }} />
     </CardContent>
   </Card>
 );
@@ -36,24 +57,44 @@ const LoadingSkeleton = ({ count = 12, variant = 'grid' }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {Array.from(new Array(count)).map((_, index) => (
-          <Card key={index} className="product-card-list" sx={{ height: 150 }}>
+          <Card key={index} className="product-card-list" sx={{ 
+            height: '180px',
+            minHeight: '180px',
+            maxHeight: '180px',
+            display: 'flex',
+            flexDirection: 'row'
+          }}>
             <Skeleton 
               variant="rectangular" 
               width={200} 
-              height={150} 
-              sx={{ borderRadius: '16px 0 0 16px' }} 
+              height={180} 
+              sx={{ 
+                borderRadius: '0',
+                flexShrink: 0
+              }} 
             />
-            <CardContent sx={{ flex: 1, p: 2.5 }}>
-              <Skeleton variant="text" height={24} sx={{ mb: 1 }} />
-              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                <Skeleton variant="rectangular" width={50} height={16} sx={{ borderRadius: 1 }} />
-                <Skeleton variant="rectangular" width={40} height={16} sx={{ borderRadius: 1 }} />
+            <CardContent sx={{ 
+              flex: 1, 
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between'
+            }}>
+              {/* Header */}
+              <Box>
+                <Skeleton variant="text" height={20} sx={{ mb: 1 }} />
+                <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                  <Skeleton variant="rectangular" width={50} height={14} sx={{ borderRadius: 1 }} />
+                  <Skeleton variant="rectangular" width={40} height={14} sx={{ borderRadius: 1 }} />
+                </Box>
+                <Skeleton variant="text" height={14} sx={{ mb: 0.5 }} />
+                <Skeleton variant="text" height={14} width="60%" sx={{ mb: 1 }} />
               </Box>
-              <Skeleton variant="text" height={16} sx={{ mb: 1 }} />
-              <Skeleton variant="text" height={16} width="60%" sx={{ mb: 2 }} />
+              
+              {/* Footer */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Skeleton variant="text" width={50} height={20} />
-                <Skeleton variant="rectangular" width={100} height={32} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="text" width={50} height={18} />
+                <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 1 }} />
               </Box>
             </CardContent>
           </Card>

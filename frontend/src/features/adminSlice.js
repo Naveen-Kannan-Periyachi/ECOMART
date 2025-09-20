@@ -16,7 +16,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-<<<<<<< HEAD
 export const getUserDetails = createAsyncThunk(
   'admin/getUserDetails',
   async (userId, { rejectWithValue }) => {
@@ -29,8 +28,6 @@ export const getUserDetails = createAsyncThunk(
   }
 );
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 export const updateUserRole = createAsyncThunk(
   'admin/updateUserRole',
   async ({ userId, role }, { rejectWithValue }) => {
@@ -105,7 +102,6 @@ export const updateOrderStatus = createAsyncThunk(
   }
 );
 
-<<<<<<< HEAD
 // User-specific item management
 export const deleteUserProduct = createAsyncThunk(
   'admin/deleteUserProduct',
@@ -143,16 +139,11 @@ export const deleteUserChat = createAsyncThunk(
   }
 );
 
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 const adminSlice = createSlice({
   name: 'admin',
   initialState: {
     users: [],
-<<<<<<< HEAD
     userDetails: null,
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
     products: [],
     orders: [],
     loading: false,
@@ -162,12 +153,9 @@ const adminSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-<<<<<<< HEAD
     clearUserDetails: (state) => {
       state.userDetails = null;
     },
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
   },
   extraReducers: (builder) => {
     builder
@@ -194,7 +182,6 @@ const adminSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.users = state.users.filter(user => user._id !== action.payload.userId);
       })
-<<<<<<< HEAD
       .addCase(getUserDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -231,8 +218,6 @@ const adminSlice = createSlice({
           state.userDetails.stats.totalChats -= 1;
         }
       })
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
       // Products
       .addCase(getAllProducts.pending, (state) => {
         state.loading = true;
@@ -272,9 +257,5 @@ const adminSlice = createSlice({
   },
 });
 
-<<<<<<< HEAD
 export const { clearError, clearUserDetails } = adminSlice.actions;
-=======
-export const { clearError } = adminSlice.actions;
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 export default adminSlice.reducer;

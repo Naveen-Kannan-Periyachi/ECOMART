@@ -3,10 +3,12 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import http from 'http';
 import { connectDB } from './config/db.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import { upload } from './middleware/uploadMiddleware.js';
 import { createAdminIfNotExists } from './utils/adminSeed.js';
+import socketService from './socket/socket.js';
 
 // Routes
 import authRoutes from './routes/authRoutes.js';
@@ -16,12 +18,12 @@ import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-<<<<<<< HEAD
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import negotiationRoutes from './routes/negotiationRoutes.js';
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
+import analyticsRoutes from './routes/analyticsRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,18 +50,22 @@ if (!process.env.MONGODB_URI) {
   process.exit(1);
 }
 
-connectDB();
+// Async function to start the server
+async function startServer() {
+  try {
+    // Connect to database first
+    await connectDB();
+    
+    createAdminIfNotExists();
 
-// Create admin user if none exists
-createAdminIfNotExists();
-
-const app = express();
+    const app = express();
 
 // Configure CORS
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+
   credentials: true
 }));
 app.use(express.json());
@@ -91,62 +97,54 @@ app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
-<<<<<<< HEAD
 app.use('/api', recommendationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/negotiations', negotiationRoutes);
-=======
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Error Handling
 app.use(notFound);
 app.use(errorHandler);
 
-
-import http from 'http';
-import socketService from './socket/socket.js';
-
 const server = http.createServer(app);
 
-<<<<<<< HEAD
 // Initialize socket with error handling
+let io;
 try {
-  const io = socketService.initialize(server);
+  io = socketService.initialize(server);
   app.set('io', io);
   console.log('✅ Socket.IO initialized successfully');
+  
+  // Socket connection handlers
+  io.on('connection', (socket) => {
+    console.log('Socket connected:', socket.id);
+    
+    // Join chat room
+    socket.on('join', ({ chatId }) => {
+      socket.join(`chat_${chatId}`);
+      console.log(`Socket ${socket.id} joined chat_${chatId}`);
+    });
+    
+    // Handle typing indicators
+    socket.on('typing', ({ chatId, userId, isTyping }) => {
+      socket.to(`chat_${chatId}`).emit('typing', { userId, isTyping });
+    });
+    
+    // Handle messages (this is mainly for real-time, actual saving is done in routes)
+    socket.on('message', ({ chatId, message }) => {
+      io.to(`chat_${chatId}`).emit('message', message);
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected:', socket.id);
+    });
+  });
 } catch (error) {
   console.error('❌ Socket.IO initialization failed:', error.message);
   console.log('📡 Continuing without Socket.IO...');
 }
-=======
-
-io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
-  
-  // Join chat room
-  socket.on('join', ({ chatId }) => {
-    socket.join(`chat_${chatId}`);
-    console.log(`Socket ${socket.id} joined chat_${chatId}`);
-  });
-  
-  // Handle typing indicators
-  socket.on('typing', ({ chatId, userId, isTyping }) => {
-    socket.to(`chat_${chatId}`).emit('typing', { userId, isTyping });
-  });
-  
-  // Handle messages (this is mainly for real-time, actual saving is done in routes)
-  socket.on('message', ({ chatId, message }) => {
-    io.to(`chat_${chatId}`).emit('message', message);
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
-  });
-});
-
-// Expose io to routes for broadcasting
-app.set('io', io);
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
 const PORT = process.env.PORT || 5001;
 
@@ -165,3 +163,12 @@ server.listen(PORT, '0.0.0.0', () => {
     MONGODB_URI: process.env.MONGODB_URI
   });
 });
+
+  } catch (error) {
+    console.error('❌ Failed to start server:', error.message);
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();

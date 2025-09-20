@@ -49,6 +49,7 @@ import {
   Store,
   Search,
   Favorite,
+  FavoriteBorder,
   Clear,
   MarkEmailRead,
   Gavel
@@ -67,7 +68,6 @@ import NotificationService from '../services/notificationService.js';
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-<<<<<<< HEAD
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -116,9 +116,6 @@ const Navbar = () => {
       }, 100);
     }
   }, [realTimeNotification, dispatch]);
-=======
-  const { isAuthenticated, user, isAdmin } = useSelector((state) => state.auth);
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
 
   const handleLogout = () => {
     dispatch(logout());
@@ -303,7 +300,6 @@ const Navbar = () => {
                       Home
                     </NavButton>
 
-<<<<<<< HEAD
                     <NavButton 
                       to="/products" 
                       icon={<Store />}
@@ -347,6 +343,28 @@ const Navbar = () => {
                             >
                               <ShoppingCart />
                             </Badge>
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Wishlist">
+                          <IconButton
+                            component={Link}
+                            to="/wishlist"
+                            className="hover-scale"
+                            sx={{
+                              color: 'white',
+                              background: 'rgba(255, 255, 255, 0.1)',
+                              backdropFilter: 'blur(10px)',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              '&:hover': {
+                                background: 'rgba(255, 255, 255, 0.25)',
+                                transform: 'scale(1.1)',
+                                boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
+                              }
+                            }}
+                          >
+                            <FavoriteBorder />
                           </IconButton>
                         </Tooltip>
 
@@ -597,114 +615,6 @@ const Navbar = () => {
               >
                 Mark all read
               </Button>
-=======
-            {isAuthenticated ? (
-              <>
-                <Button sx={{
-                  background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
-                  color: '#222',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                  transition: 'background 0.3s, transform 0.2s',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #ffd200 0%, #f7971e 100%)',
-                    transform: 'scale(1.05)',
-                  },
-                }} component={Link} to="/dashboard">
-                  Dashboard
-                </Button>
-                <Button sx={{
-                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                  color: '#fff',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                  transition: 'background 0.3s, transform 0.2s',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
-                    transform: 'scale(1.05)',
-                  },
-                }} component={Link} to="/chats">
-                  Chats
-                </Button>
-                {isAdmin && (
-                  <Button sx={{
-                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                    color: '#fff',
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                    transition: 'background 0.3s, transform 0.2s',
-                    '&:hover': {
-                      background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
-                      transform: 'scale(1.05)',
-                    },
-                  }} component={Link} to="/admin/dashboard">
-                    Admin Panel
-                  </Button>
-                )}
-                <Button sx={{
-                  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
-                  color: '#222',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                  transition: 'background 0.3s, transform 0.2s',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #38f9d7 0%, #43e97b 100%)',
-                    transform: 'scale(1.05)',
-                  },
-                }} component={Link} to="/product/new">
-                  List Item
-                </Button>
-                <Button sx={{
-                  background: 'linear-gradient(90deg, #ff5858 0%, #f09819 100%)',
-                  color: '#fff',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                  transition: 'background 0.3s, transform 0.2s',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #f09819 0%, #ff5858 100%)',
-                    transform: 'scale(1.05)',
-                  },
-                }} onClick={handleLogout}>
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button sx={{
-                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                  color: '#fff',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                  transition: 'background 0.3s, transform 0.2s',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #764ba2 0%, #667eea 100%)',
-                    transform: 'scale(1.05)',
-                  },
-                }} component={Link} to="/login">
-                  Login
-                </Button>
-                <Button sx={{
-                  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
-                  color: '#222',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(31,38,135,0.10)',
-                  transition: 'background 0.3s, transform 0.2s',
-                  '&:hover': {
-                    background: 'linear-gradient(90deg, #38f9d7 0%, #43e97b 100%)',
-                    transform: 'scale(1.05)',
-                  },
-                }} component={Link} to="/register">
-                  Register
-                </Button>
-              </>
->>>>>>> 3af5b2101e6344b36c4887c6476b665044ebd75f
             )}
           </Box>
         </Box>
@@ -719,9 +629,8 @@ const Navbar = () => {
               No notifications yet
             </Typography>
           </Box>
-        ) : (
-          <>
-            {notifications.slice(0, 5).map((notification) => {
+        ) : [
+            ...notifications.slice(0, 5).map((notification) => {
               const formattedNotification = NotificationService.formatNotification(notification);
               return (
                 <MenuItem 
@@ -774,19 +683,18 @@ const Navbar = () => {
                   </Box>
                 </MenuItem>
               );
-            })}
+            }),
             
-            {notifications.length > 5 && (
-              <MenuItem onClick={handleViewAllNotifications}>
+            ...(notifications.length > 5 ? [
+              <MenuItem key="view-all" onClick={handleViewAllNotifications}>
                 <Box textAlign="center" width="100%">
                   <Typography variant="body2" color="primary">
                     View all notifications ({notifications.length})
                   </Typography>
                 </Box>
               </MenuItem>
-            )}
-          </>
-        )}
+            ] : [])
+          ]}
       </Menu>
 
       {/* Mobile Drawer */}
@@ -846,33 +754,32 @@ const Navbar = () => {
               />
             </ListItem>
           ))}
-          {isAuthenticated && (
-            <>
-              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.2)', my: 1 }} />
-              <ListItem
-                onClick={handleLogout}
-                className="hover-lift"
-                sx={{
-                  borderRadius: 2,
-                  mx: 1,
-                  my: 0.5,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    background: 'rgba(245, 101, 101, 0.2)',
-                    transform: 'translateX(8px)'
-                  }
-                }}
-              >
-                <ListItemIcon sx={{ color: '#ff6b6b', minWidth: 40 }}>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Logout" 
-                  sx={{ '& .MuiTypography-root': { fontWeight: 500, color: '#ff6b6b' } }}
-                />
-              </ListItem>
-            </>
-          )}
+          {isAuthenticated && [
+            <Divider key="divider" sx={{ borderColor: 'rgba(255, 255, 255, 0.2)', my: 1 }} />,
+            <ListItem
+              key="logout"
+              onClick={handleLogout}
+              className="hover-lift"
+              sx={{
+                borderRadius: 2,
+                mx: 1,
+                my: 0.5,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(245, 101, 101, 0.2)',
+                  transform: 'translateX(8px)'
+                }
+              }}
+            >
+              <ListItemIcon sx={{ color: '#ff6b6b', minWidth: 40 }}>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Logout" 
+                sx={{ '& .MuiTypography-root': { fontWeight: 500, color: '#ff6b6b' } }}
+              />
+            </ListItem>
+          ]}
         </List>
       </Drawer>
 

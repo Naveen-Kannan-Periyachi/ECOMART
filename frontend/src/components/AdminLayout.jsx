@@ -9,7 +9,8 @@ import {
   FiLogOut,
   FiMenu,
   FiX,
-  FiHome
+  FiHome,
+  FiBarChart2
 } from 'react-icons/fi';
 
 const AdminLayout = () => {
@@ -25,6 +26,7 @@ const AdminLayout = () => {
 
   const sidebarItems = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: FiHome },
+    { name: 'Analytics', href: '/admin/analytics', icon: FiBarChart2 },
     { name: 'Users', href: '/admin/users', icon: FiUsers },
     { name: 'Products', href: '/admin/products', icon: FiPackage },
     { name: 'Orders', href: '/admin/orders', icon: FiShoppingCart },

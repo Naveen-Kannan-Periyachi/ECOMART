@@ -9,7 +9,6 @@ console.log('Config object:', config);
 console.log('API_URL from config:', API_URL);
 console.log('import.meta.env.VITE_API_URL:', import.meta.env.VITE_API_URL);
 console.log('All environment variables:', import.meta.env);
-console.log('======================');
 
 // Ensure we have a valid API URL
 const finalApiUrl = API_URL || 'http://localhost:5001/api';
@@ -41,7 +40,6 @@ api.interceptors.request.use(
     console.log('Config url:', config.url);
     console.log('Config method:', config.method);
     console.log('Config data:', config.data);
-    console.log('========================');
     
     return config;
   },

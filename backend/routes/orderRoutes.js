@@ -4,6 +4,7 @@ import Order from '../models/Order.js';
 import Product from '../models/productModel.js';
 import { protect } from '../middleware/authMiddleware.js';
 import NotificationService from '../services/notificationService.js';
+import { sendOrderConfirmation } from '../services/emailService.js';
 
 const router = express.Router();
 
@@ -44,6 +45,16 @@ router.post('/', protect, async (req, res) => {
       products,
       total,
       status: 'pending',
+    });
+
+    // Populate order for email
+    const populatedOrder = await Order.findById(order._id)
+      .populate('buyer', 'name email')
+      .populate('products', 'title price');
+
+    // Send order confirmation email (non-blocking)
+    sendOrderConfirmation(populatedOrder).catch(error => {
+      console.error('Failed to send order confirmation email:', error.message);
     });
 
     // Create notifications for sellers

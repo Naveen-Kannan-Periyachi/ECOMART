@@ -1,6 +1,8 @@
 import Notification from '../models/notificationModel.js';
+import User from '../models/userModel.js';
 import socketService from '../socket/socket.js';
 import { Server as SocketIOServer } from 'socket.io';
+import { sendChatNotification, sendProductSoldNotification } from './emailService.js';
 
 class NotificationService {
   constructor(io) {
@@ -65,10 +67,12 @@ class NotificationService {
   /**
    * Create message notification
    */
-  async createMessageNotification(senderId, receiverId, chatId, messageContent) {
+  async createMessageNotification(senderId, receiverId, chatId, messageContent, productData) {
     const senderName = await this.getUserName(senderId);
+    const sender = await User.findById(senderId).select('name email');
+    const recipient = await User.findById(receiverId).select('name email');
     
-    return this.createNotification({
+    const notification = await this.createNotification({
       userId: receiverId,
       type: 'NEW_MESSAGE',
       title: `New message from ${senderName}`,
@@ -83,13 +87,22 @@ class NotificationService {
       actionUrl: `/chats/${chatId}`,
       priority: 'MEDIUM'
     });
+
+    // Send email notification for chat messages (non-blocking)
+    if (sender && recipient && productData) {
+      sendChatNotification(recipient, sender, productData, messageContent).catch(error => {
+        console.error('Failed to send chat email notification:', error.message);
+      });
+    }
+
+    return notification;
   }
 
   /**
    * Create product sold notification
    */
-  async createProductSoldNotification(sellerId, productId, productTitle, buyerName) {
-    return this.createNotification({
+  async createProductSoldNotification(sellerId, productId, productTitle, buyerName, buyerData, productData) {
+    const notification = await this.createNotification({
       userId: sellerId,
       type: 'PRODUCT_SOLD',
       title: 'Product Sold Successfully!',
@@ -102,6 +115,18 @@ class NotificationService {
       actionUrl: `/products/${productId}`,
       priority: 'HIGH'
     });
+
+    // Send email notification for product sold (non-blocking)
+    if (buyerData && productData) {
+      const seller = await User.findById(sellerId).select('name email');
+      if (seller) {
+        sendProductSoldNotification(seller, productData, buyerData).catch(error => {
+          console.error('Failed to send product sold email notification:', error.message);
+        });
+      }
+    }
+
+    return notification;
   }
 
   /**
@@ -275,7 +300,6 @@ class NotificationService {
    */
   async getUserName(userId) {
     try {
-      const User = mongoose.model('User');
       const user = await User.findById(userId).select('name');
       return user ? user.name : 'Unknown User';
     } catch (error) {
